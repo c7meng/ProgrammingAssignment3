@@ -57,7 +57,7 @@ colnames(Merged_Data) <- c("subject", features[, 2], "activity")
 # determine columns of data set to keep based on column name
 columnsToKeep <- grepl("subject|activity|mean|std", colnames(Merged_Data))
 
-# ... and keep data in these columns only
+# and keep data in these columns only
 Merged_Data <- Merged_Data[, columnsToKeep]
 
 #########################################################################################################
@@ -70,21 +70,24 @@ Merged_Data$activity <- factor(Merged_Data$activity,
 #########################################################################################################
 # 4: Appropriately labels the data set with descriptive variable names.
 #########################################################################################################
-colnames(Merged_Data)<-gsub("Acc", "Accelerometer", colnames(Merged_Data))
-colnames(Merged_Data)<-gsub("Gyro", "Gyroscope", colnames(Merged_Data))
-colnames(Merged_Data)<-gsub("BodyBody", "Body", colnames(Merged_Data))
-colnames(Merged_Data)<-gsub("Mag", "Magnitude", colnames(Merged_Data))
-colnames(Merged_Data)<-gsub("^t", "Time", colnames(Merged_Data))
-colnames(Merged_Data)<-gsub("^f", "Frequency", colnames(Merged_Data))
-colnames(Merged_Data)<-gsub("tBody", "TimeBody", colnames(Merged_Data))
-colnames(Merged_Data)<-gsub("-mean()", "Mean", colnames(Merged_Data), ignore.case = TRUE)
-colnames(Merged_Data)<-gsub("-std()", "STD", colnames(Merged_Data), ignore.case = TRUE)
-colnames(Merged_Data)<-gsub("-freq()", "Frequency", colnames(Merged_Data), ignore.case = TRUE)
-colnames(Merged_Data)<-gsub("angle", "Angle", colnames(Merged_Data))
-colnames(Merged_Data)<-gsub("gravity", "Gravity", colnames(Merged_Data))
+
+# get column names
+DataCols <- colnames(Merged_Data)
+DataCols <- gsub("[\\(\\)-]", "", DataCols)
+
+# expand abbreviations and clean up names                      
+DataCols < -gsub("^f", "Frequency", DataCols)
+DataCols <- gsub("^t", "Time", DataCols)
+DataCols <- gsub("Acc", "Accelerometer", DataCols)
+DataCols <- gsub("Gyro", "Gyroscope", DataCols)
+DataCols <- gsub("Mag", "Magnitude", DataCols)
+DataCols <- gsub("Freq", "Frequency", DataCols)
+DataCols <- gsub("mean", "Mean", DataCols)
+DataCols <- gsub("std", "STD", DataCols)
+DataCols <- gsub("BodyBody", "Body", DataCols)
 
 # use new labels as column names
-colnames(Merged_Data)<- colnames(Merged_Data)
+colnames(Merged_Data) <- DataCols
 
 #########################################################################################################
 # 5: From the data set in step 4, creates a second, independent tidy data set with the average of each 
@@ -95,6 +98,6 @@ Merged_DataMeans <- Merged_Data %>%
   group_by(subject, activity) %>%
   summarise_each(funs(mean))
 
-# output to file "tidy_data.txt"
-write.table(Merged_Data, "tidy_data.txt", row.names = FALSE, 
+# output to file "TidyData.txt"
+write.table(Merged_DataMeans, "TidyData.txt", row.names = FALSE, 
             quote = FALSE)
